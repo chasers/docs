@@ -1,0 +1,118 @@
+import Guide from '~/components/layout/guide'
+import { Image } from '~/components/media'
+import Snippet from '~/components/snippet'
+
+export const meta = {
+  title: 'Send Core Web Vital Metrics to Logflare from Next.js',
+  description:
+    'Send Core Web Vital metrics to Logflare from your Next.js app for long term storage and quick query access.',
+  published: '1 June 2020',
+  authors: ['nerdberry'],
+  url: '/guides/send-core-web-vitals-to-logflare',
+  editUrl: 'pages/guides/send-core-web-vitals-to-logflare.mdx',
+  lastEdited: '2020-06-01T18:49:36.000Z',
+  image: `https://og-image.now.sh/Send%20Core%20Web%20Vitals%20to%20**Logflare**%20with%20Next.js.png?theme=dark&md=1&fontSize=100px&images=https%3A%2F%2Fassets.vercel.com%2Fimage%2Fupload%2Ffront%2Fassets%2Fdesign%2Fnextjs-white-logo.svg&images=https%3A%2F%2Flogflare.app%2Fimages%2Fandroid-icon-192x192.png`
+}
+
+[Logflare](https://logflare.app) is a centralized log analytics solution. In addition to log events, you can send any structured data to Logflare for cost effective long term storage and quick query access. To get started first sign up for a Logflare account and add a source to send events to. Then simply setup your Next.js app to send Logflare your Core Web Vitals.
+
+## Send Core Web Vitals to Logflare
+
+Follow [this official guide](https://nextjs.org/docs/advanced-features/measuring-performance) on getting the `reportWebVitals` function into your app.
+
+And then just add these functions to call inside `reportWebVitals`:
+
+```tsx
+// _app.js
+
+export function reportWebVitals(metric) {
+  toLogflare({ web_vitals: metric, url: window.document.URL })
+}
+
+function MyApp({ Component, pageProps }) {
+  return <Component {...pageProps} />
+}
+
+const toLogflare = async data => {
+  const ingestApiKey = 'YOUR_INGEST_KEY'
+  const source_id = 'YOUR_SOURCE_ID'
+  const logflareApiURL = `https://api.logflare.app/logs/json?api_key=${ingestApiKey}&source=${source_id}`
+
+  // Make Web Vitals ints for now
+  const preppedData = handleWebVitals(data)
+
+  const body = JSON.stringify(preppedData)
+  const request = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body
+  }
+
+  await fetch(logflareApiURL, request)
+}
+
+function handleWebVitals(data) {
+  if (data.web_vitals) {
+    const wv = {
+      id: data.web_vitals.id,
+      label: data.web_vitals.label,
+      name: data.web_vitals.name,
+      startTime: Math.round(data.web_vitals.startTime),
+      value: Math.round(data.web_vitals.value)
+    }
+
+    data.web_vitals = wv
+    return data
+  }
+  return data
+}
+
+export default MyApp
+```
+
+## Querying Web Vitals
+
+Then we can query our Core Web Vitals. We may want to see on average how long it takes to hydrate our app. This query does that:
+
+`m.web_vitals.name:"Next.js-hydration" c:avg(m.web_vitals.value) c:group_by(t::minute)`
+
+Now we're filtering our logs for the "Next.js-hydration" metric name and our chart is showing the average of that metric over time.
+
+<Image
+  src={`${
+    process.env.ASSETS
+  }/guides/send-web-vitals-to-logflare/next-js-hydration-query.png`}
+  width={1608 / 2}
+  height={973 / 2}
+  oversize
+/>
+
+## Customize the Event Message
+
+You probably want to make the log event message a bit more readable. Edit your Logflare source and customize the event message:
+
+<Image
+  src={`${
+    process.env.ASSETS
+  }/guides/send-web-vitals-to-logflare/custom-logflare-event-message.png`}
+  width={1608 / 2}
+  height={304 / 2}
+  oversize
+/>
+
+Now we have events that are a bit easier to scan as they come in:
+
+<Image
+  src={`${
+    process.env.ASSETS
+  }/guides/send-web-vitals-to-logflare/view-custom-logflare-event-message.png`}
+  width={1608 / 2}
+  height={972 / 2}
+  oversize
+/>
+
+[Signup for Logflare](https://logflare.app) and start sending over your Core Web Vitals today!
+
+export default ({ children }) => <Guide meta={meta}>{children}</Guide>
