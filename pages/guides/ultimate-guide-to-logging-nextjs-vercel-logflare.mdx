@@ -1,0 +1,340 @@
+import Guide from '~/components/layout/guide'
+import { Image } from '~/components/media'
+import Snippet from '~/components/snippet'
+import Note from '~/components/text/note'
+
+export const meta = {
+  title: 'The Ultimate Guide to Next.js and Vercel Logging with Logflare',
+  description:
+    'The best setup for logging from a Next.js app hosted on Vercel.',
+  published: '1 June 2020',
+  authors: ['nerdberry'],
+  url: '/guides/ultimate-guide-to-logging-nextjs-vercel-logflare',
+  editUrl: 'pages/guides/ultimate-guide-to-logging-nextjs-vercel-logflare.mdx',
+  lastEdited: '2020-06-17T20:28:34.000Z',
+  image: `https://og-image.now.sh/The%20**Ultimate**%20Guide%20to%20Logging%20with%20**Next.js**%2C%20**Vercel**%2C%20and%20**Logflare**.png?theme=dark&md=1&fontSize=100px&images=https%3A%2F%2Fassets.vercel.com%2Fimage%2Fupload%2Ffront%2Fassets%2Fdesign%2Fvercel-triangle-white.svg&images=https%3A%2F%2Flogflare.app%2Fimages%2Fandroid-icon-192x192.png`
+}
+
+In this guide we're going to walk through the ideal logging setup for a Next.js app hosted with Vercel. We're going to get Vercel's backend system to send CDN and lambda infrastructure logs to Logflare. We're also going to setup Pino to easily log JSON data. And we're going to search our newly generated logs with Logflare. Logflare automatically parses the stringy JSON log lines for you making them easily queryable with the Logflare Query Language (or even straight SQL).
+
+Vercel has put a lot of work into enabling the easy collection of logs via their Lambda function. In under a second your Vercel logs will be streamed to your browser with Logflare. In under 5 seconds they will be inserted into BigQuery and ready to query!
+
+The only issue with this setup is that Vercel truncates log lines at 4kb. Be mindful of how much you log in each request.
+
+The best thing about Vercel logging is that your log messages are automatically associated with the context of the request because they're embedded in the `lambdaMessage`. This lets us easily correlate the end user experience with our application execution.
+
+With this setup you'll get structured log events that look like:
+
+```
+{
+  "deploymentId": "dpl_EMaF3VbuvHitnNNfZEVh3CLCEMQ7",
+  "host": "pino-logflare-nextjs-vercel-example-fxy1xg64f.vercel.app",
+  "id": "1592333966170640824987875505",
+  "message": "START RequestId: 40d796c7-b1fa-45da-93dc-d0a6c9da9285 Version: $LATEST\n{\"level\":30,\"time\":1592333966191,\"env\":\"production\",\"msg\":\"Getting headers\",\"v\":1}\n{\"level\":30,\"time\":1592333966191,\"env\":\"production\",\"request\":{\"headers\":{\"host\":\"pino-logflare-nextjs-vercel-example.now.sh\",\"x_real_ip\":\"68.6.69.18\",\"sec_fetch_site\":\"same-origin\",\"sec_fetch_dest\":\"empty\",\"x_vercel_trace\":\"sfo1\",\"referer\":\"https://pino-logflare-nextjs-vercel-example.now.sh/\",\"x_vercel_forwarded_for\":\"68.6.69.18\",\"x_vercel_id\":\"f2x8s-1592333966164-93acc6b86c61\",\"x_forwarded_host\":\"pino-logflare-nextjs-vercel-example.now.sh\",\"accept\":\"*/*\",\"x_forwarded_proto\":\"https\",\"sec_fetch_mode\":\"cors\",\"x_forwarded_for\":\"68.6.69.18\",\"user_agent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36\",\"x_vercel_deployment_url\":\"pino-logflare-nextjs-vercel-example-fxy1xg64f.vercel.app\",\"accept_language\":\"en-US,en;q=0.9\",\"accept_encoding\":\"gzip, deflate, br\",\"connection\":\"close\"},\"url\":\"/api/date\",\"method\":\"GET\"},\"response\":{\"statusCode\":200},\"msg\":\"API request\",\"v\":1}\nEND RequestId: 40d796c7-b1fa-45da-93dc-d0a6c9da9285\nREPORT RequestId: 40d796c7-b1fa-45da-93dc-d0a6c9da9285\tDuration: 10.58 ms\tBilled Duration: 100 ms\tMemory Size: 1024 MB\tMax Memory Used: 76 MB\t\n",
+  "parsedLambdaMessage": {
+    "lines": [
+      {
+        "data": {
+          "env": "production",
+          "level": 30,
+          "msg": "Getting headers",
+          "time": 1592333966191,
+          "v": 1
+        }
+      },
+      {
+        "data": {
+          "env": "production",
+          "level": 30,
+          "msg": "API request",
+          "request": {
+            "headers": {
+              "accept": "*/*",
+              "accept_encoding": "gzip, deflate, br",
+              "accept_language": "en-US,en;q=0.9",
+              "connection": "close",
+              "host": "pino-logflare-nextjs-vercel-example.now.sh",
+              "referer": "https://pino-logflare-nextjs-vercel-example.now.sh/",
+              "sec_fetch_dest": "empty",
+              "sec_fetch_mode": "cors",
+              "sec_fetch_site": "same-origin",
+              "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
+              "x_forwarded_for": "68.6.69.18",
+              "x_forwarded_host": "pino-logflare-nextjs-vercel-example.now.sh",
+              "x_forwarded_proto": "https",
+              "x_real_ip": "68.6.69.18",
+              "x_vercel_deployment_url": "pino-logflare-nextjs-vercel-example-fxy1xg64f.vercel.app",
+              "x_vercel_forwarded_for": "68.6.69.18",
+              "x_vercel_id": "f2x8s-1592333966164-93acc6b86c61",
+              "x_vercel_trace": "sfo1"
+            },
+            "method": "GET",
+            "url": "/api/date"
+          },
+          "response": {
+            "statusCode": 200
+          },
+          "time": 1592333966191,
+          "v": 1
+        }
+      }
+    ],
+    "parse_status": "full",
+    "report": {
+      "billed_duration_ms": 100,
+      "duration_ms": 11,
+      "max_memory_used_mb": 76,
+      "memory_size_mb": 1024
+    },
+    "request_id": "40d796c7-b1fa-45da-93dc-d0a6c9da9285"
+  },
+  "path": "api/date",
+  "projectId": "QmRxhyrspZA1hKp4ft1yQCGeq6nVyyvyd2mv2fhyWEeEdw",
+  "proxy": {
+    "clientIp": "68.6.69.18",
+    "host": "pino-logflare-nextjs-vercel-example.now.sh",
+    "method": "GET",
+    "path": "/api/date",
+    "referer": "https://pino-logflare-nextjs-vercel-example.now.sh/",
+    "region": "sfo1",
+    "scheme": "https",
+    "statusCode": 200,
+    "timestamp": 1592333966164,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36"
+  },
+  "requestId": "f2x8s-1592333966164-93acc6b86c61",
+  "source": "lambda",
+  "statusCode": 200,
+  "timestamp": 1592333966170
+}
+```
+
+## Using your Preferred Logging Vendor
+
+This setup is possible with any other vendor. You can easily use Vercel's integration examples and write your own private integration to setup custom log drains.
+
+<Note>Log drains must be setup via an integration.</Note>
+
+We're using Logflare for this example because the Logflare integration was optimized for Vercel.
+
+## Example Repo
+
+You can reference this example repo anytime.
+
+<https://github.com/Logflare/pino-logflare-nextjs-vercel-example>
+
+## Setup the Logflare Vercel Integration
+
+🎉 Let's get started!
+
+### Install the Integration
+
+During the install process you will sign up for a Logflare account (or sign in if you already have one) and setup a new Logflare source. Logflare `source`s are where you logs will go.
+
+<https://vercel.com/integrations/logflare>
+
+### Setup a Log Drain
+
+Create a Log Drain for your Vercel project.
+
+<Image
+  src={`${
+    process.env.ASSETS
+  }/guides/ultimate-guide-to-logging-nextjs-vercel-logflare/create-vercel-log-drain.png`}
+  width={1608 / 2}
+  height={1199 / 2}
+  oversize
+/>
+
+<Note>
+  You'll want to select a project for your new Log Drain otherwise all logs for
+  all projects will go into the same Logflare source. While you can do this,
+  it's recommended to send logs from each project to a different Logflare
+  source.
+</Note>
+
+### Verify Logs
+
+Immediately after you setup a Log Drain you should see logs streaming into your Logflare account.
+
+[Visit your Logflare dashboard](https://logflare.app/dashboard)
+
+## Install Pino
+
+Install `pino`.
+
+### The Pino `base` Object
+
+Set the fields to be included with every log event in the `base` object when you instantiate Pino.
+
+### Log the Github Commit
+
+Logging the Github commit with every event is useful for tying defects to a specific deploy!
+
+```tsx
+// logger.js
+****
+import pino from 'pino';
+
+export default pino(
+    {
+        level: 'debug',
+        base: {
+            env: process.env.ENV || "ENV not set",
+            revision: process.env.VERCEL_GITHUB_COMMIT_SHA,
+
+    }
+);
+```
+
+## Finally ... Log Stuff
+
+And we're finally setup to actually log some stuff from our application! We can just setup our `logger` like:
+
+```tsx
+const logger = require('pino') from "./logger.js"
+
+let headers = { "connection": "keep-alive", "accept": "*/*" }
+
+logger.info({ request: { headers: headers } })
+```
+
+### Logging Request Headers
+
+But those aren't our real request headers. So how do we get our request headers from our Next.js app? `getServerSideProps` gets called whenever a request is made to our server. It's called with a `context` which has a bunch of interesting data about the request we can introspect with structured logging!
+
+To get the request headers we just need to access them via `getServerSideProps`:
+
+```tsx
+import { prepObjectKeys } from "./utils.js"
+
+const logger = require('pino') from "./logger.js"
+
+export async function getServerSideProps(context) {
+
+  const headers = prepObjectKeys(context.req.headers)
+
+  logger.info({ request: { headers: headers } }, "Index request")
+
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
+```
+
+<Note>
+  Notice that we need to modify our request header keys before sending them to
+  Logflare. Logflare uses BigQuery directly as it's storage engine. Logflare
+  turns each field in an event into it's own BigQuery column, and BigQuery has
+  limitation around column names. Specifically, a column name must contain only
+  letters (a-z, A-Z), numbers (0-9), or underscores (_), and it must start with
+  a letter or underscore.
+</Note>
+
+To make our request header object compatible with Logflare and BigQuery lets replace the dashes with underscores:
+
+```tsx
+// utils.js
+
+const prepObjectKeys = headers => {
+  const keyValues = {}
+  Object.keys(headers).map(key => {
+    const newKey = key.replace(/-/g, '_')
+    keyValues[newKey] = headers[key]
+  })
+
+  return keyValues
+}
+
+export { prepObjectKeys }
+```
+
+## Using Structured Log Events
+
+### Lambda Reports
+
+Logflare is different from other logging products in that we specifically designed an ingest endpoint for Vercel. The `lambdaMessage` that comes over is the console output from the lambda that runs on Verce's infrastructure. This comes over as a string. There is some really great data in there so Logflare automatically parses it into the `parsedLambdaMessage` object for you.
+
+The `report` object inside the `parsedLambdaMessage` is interesting. It reports `billing_duration_ms`, `duration_ms`, `max_memory_used_mb`, and `memory_size_mb`.
+
+<Note>
+  Easily chart the average response time of our lambdas in Logflare with the
+  query `c:avg(m.parsedLambdaMessage.report.duration_ms) c:group_by(t::minute)`
+</Note>
+
+### Example Searches for Vercel Infrastructure Logs
+
+There are lots of useful fields in the infrastructure logs provided by Vercel.
+
+All fields of the logged event are accessible with the Logflare Query Language under the `metadata` (or `m` ) object.
+
+<Image
+  src={`${
+    process.env.ASSETS
+  }/guides/ultimate-guide-to-logging-nextjs-vercel-logflare/vercel-lambda-search-logflare.png`}
+  width={1608 / 2}
+  height={890 / 2}
+  oversize
+/>
+
+`m.source:"static"` - Assets served from the Vercel CDN
+
+`m.source:"lambda"` - Function calls
+
+`m.source:"build"` - Build logs
+
+`m.proxy.statusCode:>499` - Requests with HTTP status code greater than 499
+
+`m.proxy.userAgent:~"bot"` - All user agents with `bot` in the string
+
+`m.path:~"signup/success"` - See all signups (assuming they get sent to a url containing the string `signup/success`
+
+### Example Data Studio Dashboard
+
+The Logflare Vercel integration guide has an [example Data Studio dashboard](https://logflare.app/guides/vercel-setup#example-dashboard) you can easily copy once you have a data source setup in Data Studio.
+
+### Example Alerts
+
+With Logflare you can use the same Logflare query to define alerts as you use to query. Lets setup an SMS alert so we get a text message whenever Vercel finishes deploying our changes.
+
+First add a new source to send the log event associated with a finished build. We'll call it `pino-logflare-vercel.build-done`. Edit the source to enable SMS alerts:
+
+<Image
+  src={`${
+    process.env.ASSETS
+  }/guides/ultimate-guide-to-logging-nextjs-vercel-logflare/setup-logflare-alert-vercel-build.png`}
+  width={1608 / 2}
+  height={1051 / 2}
+  oversize
+/>
+
+And now we simply send our build done message to that source with a rule on our main ingest source.
+
+<Image
+  src={`${
+    process.env.ASSETS
+  }/guides/ultimate-guide-to-logging-nextjs-vercel-logflare/logflare-vercel-event-routing-rules.png`}
+  width={1608 / 2}
+  height={1057 / 2}
+  oversize
+/>
+
+## Why BigQuery for Logs and Metrics?
+
+BigQuery is an amazing tool for storing and querying lots of data. It was [originally designed](https://cloud.google.com/files/BigQueryTechnicalWP.pdf) specifically to store and query click data from Google's ad network. They simply wanted a time series chart. With BigQuery we can quickly derive time series data from billions of structured events. And then continue to derive these metrics dynamically with SQL. We don't need to define new "metrics" for each version of a "metric" we're interested in.
+
+Lets say we have users on paid plans. Typically with StatsD type "metrics" we'd have to define a new metric for user logins for each plan. This doesn't seem terrible, but what if we had 100 attributes per login? We'd need a separate "metric" for every combination of attribute someone would potentially want to know about. And we'd have to set it all up in advance.
+
+Instead of doing that, we can just log the structured event with whatever data we want and retroactively query it in any unknown combination we may think of in the future.
+
+With Logflare and BigQuery we just send a structured event each time a user logs in, with fields about that user. So we can just query for users by plan. The Logflare Query Language query would simply be `m.user_login.plan:"pro"`.
+
+And now, since we have all the individual events backing our metrics, we can drill into the specific events making up each point in time in our charts. So if there is a spike in user logins, we can drill into that spike and see exactly who logged in when and how many times. With typical "metrics" like from StatsD this is impossible.
+
+## Bonus: Log Core Web Vitals to Logflare
+
+Pino is great because we can now setup our app to log from the client in the exact same way we log from the server. To set this up follow our guide on sending Core Web Vitals to Logflare from your Next.js app.
+
+\#TODO Link to Core Web Vitals Logflare guide here.
+
+export default ({ children }) => <Guide meta={meta}>{children}</Guide>
