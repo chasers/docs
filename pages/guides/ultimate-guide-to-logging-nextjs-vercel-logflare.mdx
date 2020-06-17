@@ -11,7 +11,7 @@ export const meta = {
   authors: ['nerdberry'],
   url: '/guides/ultimate-guide-to-logging-nextjs-vercel-logflare',
   editUrl: 'pages/guides/ultimate-guide-to-logging-nextjs-vercel-logflare.mdx',
-  lastEdited: '2020-06-17T20:28:34.000Z',
+  lastEdited: '2020-06-17T20:34:13.000Z',
   image: `https://og-image.now.sh/The%20**Ultimate**%20Guide%20to%20Logging%20with%20**Next.js**%2C%20**Vercel**%2C%20and%20**Logflare**.png?theme=dark&md=1&fontSize=100px&images=https%3A%2F%2Fassets.vercel.com%2Fimage%2Fupload%2Ffront%2Fassets%2Fdesign%2Fvercel-triangle-white.svg&images=https%3A%2F%2Flogflare.app%2Fimages%2Fandroid-icon-192x192.png`
 }
 
@@ -331,9 +331,9 @@ With Logflare and BigQuery we just send a structured event each time a user logs
 
 And now, since we have all the individual events backing our metrics, we can drill into the specific events making up each point in time in our charts. So if there is a spike in user logins, we can drill into that spike and see exactly who logged in when and how many times. With typical "metrics" like from StatsD this is impossible.
 
-## Bonus: Log Core Web Vitals to Logflare
+## Bonus: Send Core Web Vitals to Logflare
 
-Pino is great because we can now setup our app to log from the client in the exact same way we log from the server. To set this up follow our guide on sending Core Web Vitals to Logflare from your Next.js app.
+Next, setup your Next.js app to send Core Web Vitals to Logflare!
 
 \#TODO Link to Core Web Vitals Logflare guide here.
 
