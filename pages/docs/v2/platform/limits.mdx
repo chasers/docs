@@ -45,7 +45,7 @@ To prevent abuse of our platform, we apply the following limits to all accounts.
 
 All log types - **Build Time**, **Edge Network**, and **Runtime** - have differing behavior when it comes to storing logs.
 
-During the [Build Step](/docs/v2/platform/glossary#build-step), all logs are stored and **persisted**.
+During the [Build Step](/docs/v2/platform/glossary#build-step), the last 2,000 log lines are stored and persisted.
 
 For [Edge Network requests](/docs/v2/edge-network/regions#automatic-edge-cdn), all logs are **not persisted**.
 
@@ -116,9 +116,9 @@ If a Serverless Function receives a payload in excess of the limit it will retur
 
 ## Serverless Function Regions
 
-It is possible to deploy [Serverless Functions](/docs/v2/serverless-functions/introduction/) to multiple regions, however this featured is limited to [paid plans](/pricing).
+It is possible to deploy [Serverless Functions](/docs/v2/serverless-functions/introduction/) to multiple regions, however this featured is limited to [Enterprise plans](/pricing).
 
-When attempting to deploy Serverless Functions to multiple regions on the Hobby plan, the deployment will fail before entering the [build step](/docs/v2/build-step/).
+When attempting to deploy Serverless Functions to multiple regions on a non-Enterprise plan, the deployment will fail before entering the [build step](/docs/v2/build-step/).
 
 ## Streaming Responses
 

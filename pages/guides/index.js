@@ -27,10 +27,10 @@ const Guides = () => (
           <div className="actions">
             <span className="caption">Sorted by Newest</span>
             <Link
-              href="https://github.com/zeit/docs/issues/new?labels=Section%3A+Guides&template=guide-report-or-request.md"
+              href="https://github.com/vercel/docs/issues/new?labels=Section%3A+Guides&template=guide-report-or-request.md"
               underlineOnHover={false}
             >
-              <Button secondary small>
+              <Button type="secondary" small>
                 Request a Guide
               </Button>
             </Link>
@@ -62,7 +62,7 @@ const Guides = () => (
             </Link>
           ))}
 
-          <Link href="https://github.com/zeit/docs/blob/master/CONTRIBUTING.md#guides">
+          <Link href="https://github.com/vercel/docs/blob/master/CONTRIBUTING.md#guides">
             <article className="guide contribute">
               <div className="titles">
                 <H3>Write Your Guide →</H3>
