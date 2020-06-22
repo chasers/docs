@@ -1,7 +1,10 @@
 import Guide from '~/components/layout/guide'
 import { Image } from '~/components/media'
+import { Video } from '~/components/media'
 import Snippet from '~/components/snippet'
 import Note from '~/components/text/note'
+import { DeployButton, Button } from '~/components/buttons'
+import Link from '~/components/text/link'
 
 export const meta = {
   title: 'The Ultimate Guide to Next.js and Vercel Logging with Logflare',
@@ -11,17 +14,38 @@ export const meta = {
   authors: ['nerdberry'],
   url: '/guides/ultimate-guide-to-logging-nextjs-vercel-logflare',
   editUrl: 'pages/guides/ultimate-guide-to-logging-nextjs-vercel-logflare.mdx',
-  lastEdited: '2020-06-17T20:49:27.000Z',
+  lastEdited: '2020-06-22T19:16:47.000Z',
   image: `https://og-image.now.sh/The%20**Ultimate**%20Guide%20to%20Logging%20with%20**Next.js**%2C%20**Vercel**%2C%20and%20**Logflare**.png?theme=dark&md=1&fontSize=100px&images=https%3A%2F%2Fassets.vercel.com%2Fimage%2Fupload%2Ffront%2Fassets%2Fdesign%2Fvercel-triangle-white.svg&images=https%3A%2F%2Flogflare.app%2Fimages%2Fandroid-icon-192x192.png`
 }
 
-In this guide we're going to walk through the ideal logging setup for a Next.js app hosted with Vercel. We're going to get Vercel's backend system to send CDN and lambda infrastructure logs to Logflare. We're also going to setup Pino to easily log JSON data. And we're going to search our newly generated logs with Logflare. Logflare automatically parses the stringy JSON log lines for you making them easily queryable with the Logflare Query Language (or even straight SQL).
+Logs are an important part of running an app to understand what's going on at any point in time and Vercel has put in a lot of work into enabling the easy collection of logs via Serverless Functions in co-operation with platforms that specialize in dealing with logs, such as Logflare.
 
-Vercel has put a lot of work into enabling the easy collection of logs via their Lambda function. In under a second your Vercel logs will be streamed to your browser with Logflare. In under 5 seconds they will be inserted into BigQuery and ready to query!
+In this guide we're going to walk through an ideal logging setup for a Next.js app, with Serverless functions, hosted with Vercel along with Logflare for Logs. Additionally, we're going to take a look at setting up Pino to easily log JSON data.
 
-The only issue with this setup is that Vercel truncates log lines at 4kb. Be mindful of how much you log in each request.
+<Video
+  src={`https://p195.p4.n0.cdn.getcloudapp.com/items/nOuelOom/quick-logflare-vercel-demo.mp4`}
+  width={1440 / 1.5}
+  height={900 / 1.5}
+  oversize
+  controls
+  muted={false}
+  autoPlay={false}
+  caption={'Quick Logflare + Vercel + Next.js demo'}
+  loop={false}
+/>
 
-The best thing about Vercel logging is that your log messages are automatically associated with the context of the request because they're embedded in the `lambdaMessage`. This lets us easily correlate the end user experience with our application execution.
+## What You'll Get with Logflare
+
+Logflare automatically parses the stringy JSON log lines that Vercel sends, making them easily queryable with the Logflare Query Language (or even just SQL).
+
+In under a second your Vercel logs will be streamed to your browser with Logflare. In under 5 seconds they will be inserted into BigQuery and ready to query!
+
+<Note>
+  Vercel truncates log lines at 4kb so be mindful of how much you log in each
+  request.
+</Note>
+
+The best thing about Vercel logging is that your log messages are automatically associated with the context of the request because they're embedded in the `lambdaMessage`. This lets you easily correlate the end user experience with our application execution.
 
 With this setup you'll get structured log events that look like:
 
@@ -109,71 +133,25 @@ With this setup you'll get structured log events that look like:
 }
 ```
 
-## Using your Preferred Logging Vendor
+## Deploy the Example Repo
 
-This setup is possible with any other vendor. You can easily use Vercel's integration examples and write your own private integration to setup custom log drains.
+🎉 Let's get started! Deploy the example repo.
 
-<Note>Log drains must be setup via an integration.</Note>
+<DeployButton url="https://vercel.com/new/project?template=https://github.com/Logflare/pino-logflare-nextjs-vercel-example" />
 
-We're using Logflare for this example because the Logflare integration was optimized for Vercel.
+## The Example Repo in Detail
 
-## Example Repo
+What exactly have we done in our example repo?
 
-You can reference this example repo anytime.
+### Logging the Github Commit
 
-<https://github.com/Logflare/pino-logflare-nextjs-vercel-example>
-
-## Setup the Logflare Vercel Integration
-
-🎉 Let's get started!
-
-### Install the Integration
-
-During the install process you will sign up for a Logflare account (or sign in if you already have one) and setup a new Logflare source. Logflare `source`s are where you logs will go.
-
-<https://vercel.com/integrations/logflare>
-
-### Setup a Log Drain
-
-Create a Log Drain for your Vercel project.
-
-<Image
-  src={`${
-    process.env.ASSETS
-  }/guides/ultimate-guide-to-logging-nextjs-vercel-logflare/create-vercel-log-drain.png`}
-  width={1608 / 2}
-  height={1199 / 2}
-  oversize
-/>
-
-<Note>
-  You'll want to select a project for your new Log Drain otherwise all logs for
-  all projects will go into the same Logflare source. While you can do this,
-  it's recommended to send logs from each project to a different Logflare
-  source.
-</Note>
-
-### Verify Logs
-
-Immediately after you setup a Log Drain you should see logs streaming into your Logflare account.
-
-[Visit your Logflare dashboard](https://logflare.app/dashboard)
-
-## Install Pino
-
-Install `pino`.
-
-### The Pino `base` Object
-
-Set the fields to be included with every log event in the `base` object when you instantiate Pino.
-
-### Log the Github Commit
+Set the fields to be included with every log event in the `base` object when you instantiate Pino.
 
 Logging the Github commit with every event is useful for tying defects to a specific deploy!
 
-```tsx
+```jsx
 // logger.js
-****
+
 import pino from 'pino';
 
 export default pino(
@@ -187,25 +165,15 @@ export default pino(
 );
 ```
 
-## Finally ... Log Stuff
-
-And we're finally setup to actually log some stuff from our application! We can just setup our `logger` like:
-
-```tsx
-const logger = require('pino') from "./logger.js"
-
-let headers = { "connection": "keep-alive", "accept": "*/*" }
-
-logger.info({ request: { headers: headers } })
-```
-
 ### Logging Request Headers
 
-But those aren't our real request headers. So how do we get our request headers from our Next.js app? `getServerSideProps` gets called whenever a request is made to our server. It's called with a `context` which has a bunch of interesting data about the request we can introspect with structured logging!
+Let's log all our request headers so we can understand which user agents are making requests to our service. `getServerSideProps` gets called whenever a request is made to our server. It's called with a `context` which has a bunch of interesting data about the request we can introspect with structured logging!`getServerSideProps` gets called whenever a request is made to our server. It's called with a `context` which has a bunch of interesting data about the request we can introspect with structured logging!
 
 To get the request headers we just need to access them via `getServerSideProps`:
 
-```tsx
+```jsx
+// index.js
+
 import { prepObjectKeys } from "./utils.js"
 
 const logger = require('pino') from "./logger.js"
@@ -233,7 +201,7 @@ export async function getServerSideProps(context) {
 
 To make our request header object compatible with Logflare and BigQuery lets replace the dashes with underscores:
 
-```tsx
+```jsx
 // utils.js
 
 const prepObjectKeys = headers => {
@@ -248,6 +216,54 @@ const prepObjectKeys = headers => {
 
 export { prepObjectKeys }
 ```
+
+## Setup the Logflare Vercel Integration with Your Project
+
+Now that we're logging some useful data lets setup the Logflare Vercel integration to get our newly structured logs going to Logflare.
+
+### Step 1: Install the Integration
+
+During the install process you will sign up for a Logflare account (or sign in if you already have one) and setup a new Logflare source. Logflare `source`s are where you logs will go.
+
+<Link
+  href="https://vercel.com/integrations/logflare"
+  underlineOnHover={false}
+  target="_blank"
+>
+  <Button primary>Install Logflare Vercel Integration</Button>
+</Link>
+
+### Step 2: Setup a Log Drain
+
+Create a Log Drain for your Vercel project.
+
+<Image
+  src={`${
+    process.env.ASSETS
+  }/guides/ultimate-guide-to-logging-nextjs-vercel-logflare/create-vercel-log-drain.png`}
+  width={1608 / 2}
+  height={1199 / 2}
+  oversize
+/>
+
+<Note>
+  You'll want to select a project for your new Log Drain otherwise all logs for
+  all projects will go into the same Logflare source. While you can do this,
+  it's recommended to send logs from each project to a different Logflare
+  source.
+</Note>
+
+### Step 3: Verify Logs
+
+Immediately after you setup a Log Drain you should see logs streaming into your Logflare account.
+
+<Link
+  href="https:logflare.app/dashboard"
+  underlineOnHover={false}
+  target="_blank"
+>
+  <Button primary>Visit Your Logflare Dashboard</Button>
+</Link>
 
 ## Using Structured Log Events
 
