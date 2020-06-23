@@ -14,24 +14,23 @@ export const meta = {
   authors: ['nerdberry'],
   url: '/guides/ultimate-guide-to-logging-nextjs-vercel-logflare',
   editUrl: 'pages/guides/ultimate-guide-to-logging-nextjs-vercel-logflare.mdx',
-  lastEdited: '2020-06-22T19:16:47.000Z',
+  lastEdited: '2020-06-23T20:40:22.000Z',
   image: `https://og-image.now.sh/The%20**Ultimate**%20Guide%20to%20Logging%20with%20**Next.js**%2C%20**Vercel**%2C%20and%20**Logflare**.png?theme=dark&md=1&fontSize=100px&images=https%3A%2F%2Fassets.vercel.com%2Fimage%2Fupload%2Ffront%2Fassets%2Fdesign%2Fvercel-triangle-white.svg&images=https%3A%2F%2Flogflare.app%2Fimages%2Fandroid-icon-192x192.png`
 }
 
-Logs are an important part of running an app to understand what's going on at any point in time and Vercel has put in a lot of work into enabling the easy collection of logs via Serverless Functions in co-operation with platforms that specialize in dealing with logs, such as Logflare.
+Logs are an important part of running an app to understand what's going on at any point in time and Vercel has put in a lot of work into enabling the easy collection of logs via Serverless Functions in co-operation with platforms that specialize in dealing with logs, such as <Link href="https://logflare.app" target="_blank">Logflare</Link>.
 
-In this guide we're going to walk through an ideal logging setup for a Next.js app, with Serverless functions, hosted with Vercel along with Logflare for Logs. Additionally, we're going to take a look at setting up Pino to easily log JSON data.
+In this guide we're going to walk through an ideal logging setup for a Next.js app, with Serverless functions, hosted with Vercel along with Logflare for logs. Additionally, we're going to take a look at setting up Pino to easily log JSON data.
 
 <Video
-  src={`https://p195.p4.n0.cdn.getcloudapp.com/items/nOuelOom/quick-logflare-vercel-demo.mp4`}
+  src={`https://p195.p4.n0.cdn.getcloudapp.com/items/04uYA7eX/trimmed-logflare-preview-vercel.mp4`}
   width={1440 / 1.5}
   height={900 / 1.5}
   oversize
   controls
-  muted={false}
-  autoPlay={false}
-  caption={'Quick Logflare + Vercel + Next.js demo'}
-  loop={false}
+  muted
+  autoPlay
+  loop
 />
 
 ## What You'll Get with Logflare
