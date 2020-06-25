@@ -14,7 +14,7 @@ export const meta = {
   authors: ['nerdberry'],
   url: '/guides/ultimate-guide-to-logging-nextjs-vercel-logflare',
   editUrl: 'pages/guides/ultimate-guide-to-logging-nextjs-vercel-logflare.mdx',
-  lastEdited: '2020-06-23T20:40:22.000Z',
+  lastEdited: '2020-06-25T15:15:40.000Z',
   image: `https://og-image.now.sh/The%20**Ultimate**%20Guide%20to%20Logging%20with%20**Next.js**%2C%20**Vercel**%2C%20and%20**Logflare**.png?theme=dark&md=1&fontSize=100px&images=https%3A%2F%2Fassets.vercel.com%2Fimage%2Fupload%2Ffront%2Fassets%2Fdesign%2Fvercel-triangle-white.svg&images=https%3A%2F%2Flogflare.app%2Fimages%2Fandroid-icon-192x192.png`
 }
 
@@ -23,7 +23,9 @@ Logs are an important part of running an app to understand what's going on at an
 In this guide we're going to walk through an ideal logging setup for a Next.js app, with Serverless functions, hosted with Vercel along with Logflare for logs. Additionally, we're going to take a look at setting up Pino to easily log JSON data.
 
 <Video
-  src={`https://p195.p4.n0.cdn.getcloudapp.com/items/04uYA7eX/trimmed-logflare-preview-vercel.mp4`}
+  src={`${
+    process.env.ASSETS
+  }/guides/ultimate-guide-to-logging-nextjs-vercel-logflare/logflare-vercel-demo.mp4`}
   width={1440 / 1.5}
   height={900 / 1.5}
   oversize
@@ -306,7 +308,20 @@ All fields of the logged event are accessible with the Logflare Query Language u
 
 ### Example Data Studio Dashboard
 
-The Logflare Vercel integration guide has an [example Data Studio dashboard](https://logflare.app/guides/vercel-setup#example-dashboard) you can easily copy once you have a data source setup in Data Studio.
+<Video
+  src={`${
+    process.env.ASSETS
+  }/guides/ultimate-guide-to-logging-nextjs-vercel-logflare/explore-vercel-logs.mp4`}
+  width={1440 / 1.5}
+  height={900 / 1.5}
+  oversize
+  controls
+  muted
+  autoPlay
+  loop
+/>
+
+Logflare integrates seemlessly with Google Data Studio. The Logflare Vercel integration guide has an [example Data Studio dashboard](https://logflare.app/guides/vercel-setup#example-dashboard) you can easily copy once you have a data source setup in Data Studio.
 
 ### Example Alerts
 
