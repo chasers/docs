@@ -349,7 +349,7 @@ And now we simply send our build done message to that source with a rule on our 
 
 BigQuery is an amazing tool for storing and querying lots of data. It was [originally designed](https://cloud.google.com/files/BigQueryTechnicalWP.pdf) specifically to store and query click data from Google's ad network. They simply wanted a time series chart. With BigQuery we can quickly derive time series data from billions of structured events. And then continue to derive these metrics dynamically with SQL. We don't need to define new "metrics" for each version of a "metric" we're interested in.
 
-Lets say we have users on paid plans. Typically with StatsD type "metrics" we'd have to define a new metric for user logins for each plan. This doesn't seem terrible, but what if we had 100 attributes per login? We'd need a separate "metric" for every combination of attribute someone would potentially want to know about. And we'd have to set it all up in advance.
+Let’s say we have users on paid plans. Typically with StatsD type "metrics" we'd have to define a new metric for user logins for each plan. This doesn't seem terrible, but what if we had 100 attributes per login? We'd need a separate "metric" for every combination of attributes someone would potentially want to know about. And we'd have to set it all up in advance.
 
 Instead of doing that, we can just log the structured event with whatever data we want and retroactively query it in any unknown combination we may think of in the future.
 
