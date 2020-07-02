@@ -185,16 +185,9 @@ export async function getServerSideProps(context) {
 }
 ```
 
-<Note>
-  Notice that we need to modify our request header keys before sending them to
-  Logflare. Logflare uses BigQuery directly as it's storage engine. Logflare
-  turns each field in an event into it's own BigQuery column, and BigQuery has
-  limitation around column names. Specifically, a column name must contain only
-  letters (a-z, A-Z), numbers (0-9), or underscores (_), and it must start with
-  a letter or underscore.
-</Note>
+Notice that we need to modify our request header keys before sending them to Logflare. Logflare uses BigQuery directly as it's storage engine. Logflare turns each field in an event into it's own BigQuery column, and BigQuery has limitation around column names. Specifically, a column name must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_), and it must start with a letter or underscore.
 
-To make our request header object compatible with Logflare and BigQuery lets replace the dashes with underscores:
+To make our request header object compatible with Logflare and BigQuery, we call `prepObjectKeys` which replaces the dashes with underscores:
 
 ```jsx
 // utils.js
