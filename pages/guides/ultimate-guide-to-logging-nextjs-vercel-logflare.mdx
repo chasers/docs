@@ -167,11 +167,12 @@ export default pino(
 Let's log all our request headers so we can understand which user agents are making requests to our service. `getServerSideProps` gets called whenever a request is made to our server. It's called with a `context` which has a bunch of interesting data about the request we can introspect with structured logging.
 
 ```jsx
-// index.js
+// pages/index.js
 
-import { prepObjectKeys } from "./utils.js"
+import { prepObjectKeys } from "../logger/utils.js"
+import logger from "../logger/logger.js"
 
-const logger = require('pino') from "./logger.js"
+// ...
 
 export async function getServerSideProps(context) {
 
