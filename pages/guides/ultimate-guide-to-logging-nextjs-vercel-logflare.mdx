@@ -164,9 +164,7 @@ export default pino(
 
 ### Logging Request Headers
 
-Let's log all our request headers so we can understand which user agents are making requests to our service. `getServerSideProps` gets called whenever a request is made to our server. It's called with a `context` which has a bunch of interesting data about the request we can introspect with structured logging!`getServerSideProps` gets called whenever a request is made to our server. It's called with a `context` which has a bunch of interesting data about the request we can introspect with structured logging!
-
-To get the request headers we just need to access them via `getServerSideProps`:
+Let's log all our request headers so we can understand which user agents are making requests to our service. `getServerSideProps` gets called whenever a request is made to our server. It's called with a `context` which has a bunch of interesting data about the request we can introspect with structured logging.
 
 ```jsx
 // index.js
