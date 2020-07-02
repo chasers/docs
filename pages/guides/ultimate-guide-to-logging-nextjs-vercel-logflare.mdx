@@ -134,37 +134,33 @@ With this setup you'll get structured log events that look like:
 }
 ```
 
-## Deploy the Example Repo
+## Example Repository
 
-🎉 Let's get started! Deploy the example repo.
+Let’s walk through the example repository, which is available on GitHub: [pino-logflare-nextjs-vercel-example](https://github.com/Logflare/pino-logflare-nextjs-vercel-example).
+
+You can deploy it on Vercel by clicking the button below:
 
 <DeployButton url="https://vercel.com/new/project?template=https://github.com/Logflare/pino-logflare-nextjs-vercel-example" />
 
-## The Example Repo in Detail
-
-What exactly have we done in our example repo?
-
 ### Logging the Github Commit
 
-Set the fields to be included with every log event in the `base` object when you instantiate Pino.
+We created a logger ([logger.js](https://github.com/Logflare/pino-logflare-nextjs-vercel-example/blob/main/logger/logger.js)) which sets the fields to be included with every log event in the `base` object when you instantiate Pino.
 
-Logging the Github commit with every event is useful for tying defects to a specific deploy!
+Logging the Github commit with every event is useful for tying defects to a specific deploy.
 
 ```jsx
-// logger.js
-
+// logger/logger.js
 import pino from 'pino';
 
 export default pino(
-    {
-        level: 'debug',
-        base: {
-            env: process.env.ENV || "ENV not set",
-            revision: process.env.VERCEL_GITHUB_COMMIT_SHA,
-
+  {
+    level: 'debug',
+    base: {
+      env: process.env.ENV || "ENV not set",
+      revision: process.env.VERCEL_GITHUB_COMMIT_SHA,
     }
+  }
 );
-```
 
 ### Logging Request Headers
 
