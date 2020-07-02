@@ -290,17 +290,12 @@ All fields of the logged event are accessible with the Logflare Query Language u
   oversize
 />
 
-`m.source:"static"` - Assets served from the Vercel CDN
-
-`m.source:"lambda"` - Function calls
-
-`m.source:"build"` - Build logs
-
-`m.proxy.statusCode:>499` - Requests with HTTP status code greater than 499
-
-`m.proxy.userAgent:~"bot"` - All user agents with `bot` in the string
-
-`m.path:~"signup/success"` - See all signups (assuming they get sent to a url containing the string `signup/success`
+- `m.source:"static"` - Assets served from the Vercel CDN
+- `m.source:"lambda"` - Function calls
+- `m.source:"build"` - Build logs
+- `m.proxy.statusCode:>499` - Requests with HTTP status code greater than 499
+- `m.proxy.userAgent:~"bot"` - All user agents with `bot` in the string
+- `m.path:~"signup/success"` - See all signups (assuming they get sent to a url containing the string `signup/success`
 
 ### Example Data Studio Dashboard
 
