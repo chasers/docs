@@ -190,7 +190,7 @@ Notice that we need to modify our request header keys before sending them to Log
 To make our request header object compatible with Logflare and BigQuery, we call `prepObjectKeys` which replaces the dashes with underscores:
 
 ```jsx
-// utils.js
+// logger/utils.js
 
 const prepObjectKeys = headers => {
   const keyValues = {}
@@ -207,11 +207,11 @@ export { prepObjectKeys }
 
 ## Setup the Logflare Vercel Integration with Your Project
 
-Now that we're logging some useful data lets setup the Logflare Vercel integration to get our newly structured logs going to Logflare.
+Now that we're logging some useful data, let’s set up the Logflare Vercel integration to get our newly structured logs going to Logflare.
 
 ### Step 1: Install the Integration
 
-During the install process you will sign up for a Logflare account (or sign in if you already have one) and setup a new Logflare source. Logflare `source`s are where you logs will go.
+Click the button below to install the integration. During the install process, you will sign up for a Logflare account (or sign in if you already have one) and set up a new Logflare source. Logflare `source`s are where your logs will go.
 
 <Link
   href="https://vercel.com/integrations/logflare"
@@ -235,7 +235,7 @@ Create a Log Drain for your Vercel project.
 />
 
 <Note>
-  You'll want to select a project for your new Log Drain otherwise all logs for
+  You'll want to select a project for your new Log Drain. Otherwise all logs for
   all projects will go into the same Logflare source. While you can do this,
   it's recommended to send logs from each project to a different Logflare
   source.
@@ -243,7 +243,7 @@ Create a Log Drain for your Vercel project.
 
 ### Step 3: Verify Logs
 
-Immediately after you setup a Log Drain you should see logs streaming into your Logflare account.
+Immediately after you set up a Log Drain, you should see logs streaming into your Logflare account.
 
 <Link
   href="https://logflare.app/dashboard"
@@ -257,13 +257,13 @@ Immediately after you setup a Log Drain you should see logs streaming into your 
 
 ### Lambda Reports
 
-Logflare is different from other logging products in that we specifically designed an ingest endpoint for Vercel. The `lambdaMessage` that comes over is the console output from the lambda that runs on Verce's infrastructure. This comes over as a string. There is some really great data in there so Logflare automatically parses it into the `parsedLambdaMessage` object for you.
+Logflare is different from other logging products in that we specifically designed an ingest endpoint for Vercel. The `lambdaMessage` that comes over is the console output from the lambda that runs on Verce's infrastructure. This comes over as a string. Logflare automatically parses it into the `parsedLambdaMessage` object for you.
 
 The `report` object inside the `parsedLambdaMessage` is interesting. It reports `billing_duration_ms`, `duration_ms`, `max_memory_used_mb`, and `memory_size_mb`.
 
 <Note>
   Easily chart the average response time of our lambdas in Logflare with the
-  query `c:avg(m.parsedLambdaMessage.report.duration_ms) c:group_by(t::minute)`
+  query `c:avg(m.parsedLambdaMessage.report.duration_ms) c:group_by(t::minute)`.
 </Note>
 
 ### Example Searches for Vercel Infrastructure Logs
