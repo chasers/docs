@@ -8,12 +8,13 @@ import OrgName from '~/components/name/org-name'
 import NameWrapper from '~/components/name/name-wrapper'
 import { PRODUCT_NAME } from '~/lib/constants'
 import ProductShortName from '~/components/name/product-short-name'
+import Snippet from '~/components/snippet'
 
 export const meta = {
   title: 'Frequently Asked Questions',
   description: 'A list of frequently asked questions relating to deployments.',
   editUrl: 'pages/docs/v2/platform/frequently-asked-questions.mdx',
-  lastEdited: '2020-06-11T18:32:05.000Z'
+  lastEdited: '2020-07-24T14:16:01.000Z'
 }
 
 ## Platform Version Detection
@@ -31,7 +32,7 @@ If you are yet to upgrade to the latest platform version, please read our [upgra
 
 ## Green Energy Policy
 
-​<OrgName /> works with multiple cloud partners in order to provide services to end users.
+<OrgName /> works with multiple cloud partners in order to provide services to end users.
 
 The Serverless approach is an energy-efficient alternative to traditional servers because your code runs only on-demand.
 
@@ -43,7 +44,7 @@ For more information on our cloud partners' Green energy policies, we recommend 
 
 ## What can I deploy with <NameWrapper name={PRODUCT_NAME} />?
 
-​<ProductName /> is best at deploying technologies that can be served over HTTP and distributed through our CDN network:
+<ProductName /> is best at deploying technologies that can be served over HTTP and distributed through our CDN network:
 
 - Static websites and static generators ([Next.js](/guides/deploying-nextjs-with-now), React, Vue, Angular, etc)
 - Code that renders HTML on the server-side
@@ -204,3 +205,110 @@ These conflicting configuration errors occur if:
 - Both `.vercel` and `.now` directories exist in your project.<br />**Solution:** Delete the `.now` directory.
 - Both `.vercelignore` and `.nowignore` files exist in your project.<br />**Solution:** Delete the `.nowignore` file.
 - Environment Variables that begin with `VERCEL_` have a conflicting Environment Variable that begins with `NOW_`.<br />**Solution:** Only define the `VERCEL_` prefixed Environment Variable.
+
+## Conflicting "functions" and "builds" Configuration
+
+There are two different ways to configure Serverless Functions in your project: [`functions`](/docs/configuration#project/functions) _or_ [`builds`](/docs/configuration#project/builds). However, only one of them may be used at a time - they cannot be used in conjuction.
+
+For most cases, it is recommended to use the `functions` property because it supports more features, such as:
+
+- Allows configuration of the amount of memory that the Serverless Function is provided with.
+- More reliable because it requires a specific npm package version for the `runtime` property.
+- Supports "clean URLs" by default, which means that the Serverless Functions are automatically accessible without their file extension in the URL.
+
+However, the [`builds`](/docs/configuration#project/builds) property will remain supported for backwards compatibility purposes.
+
+## Deploying Serverless Functions to Multiple Regions
+
+It's possible to deploy Serverless Functions to multiple regions, but it's restricted to the [Enterprise plan](/pricing) for Teams.
+
+On the [Pro plan](/pricing), the limitation has been around since the [launch](/blog/simpler-pricing) of the current pricing model but was applied on **July 10, 2020**. For Projects created on or after the date, it's no longer possible to deploy to multiple regions.
+
+To select a single suitable region for your Serverless Functions, please read our [guide](/knowledge/choosing-deployment-regions).
+
+## Unmatched Function Pattern
+
+The [`functions`](/docs/configuration#project/functions) property uses a glob pattern for each key. This pattern must match Serverless Function source files within the `api` directory.
+
+If you are using Next.js, Serverless Functions source files can be created in the following:
+
+- `pages/api` directory
+- `src/pages/api` directory
+- `pages` directory when the module exports [getServerSideProps](https://nextjs.org/docs/basic-features/data-fetching#getserversideprops-server-side-rendering)
+- `src/pages` directory when the module exports [getServerSideProps](https://nextjs.org/docs/basic-features/data-fetching#getserversideprops-server-side-rendering)
+
+Additionally, if you'd like to use a Serverless Function that isn't written with Node.js in combination with Next.js, you can place it in the `api` directory (provided by the platform), since `pages/api` (provided by Next.js) only supports JavaScript.
+
+**Not Allowed**
+
+```json
+{
+  "functions": {
+    "users/**/*.js": {
+      "maxDuration": 30
+    }
+  }
+}
+```
+
+**Allowed**
+
+```json
+{
+  "functions": {
+    "api/users/**/*.js": {
+      "maxDuration": 30
+    }
+  }
+}
+```
+
+**Allowed (Next.js)**
+
+```json
+{
+  "functions": {
+    "pages/api/users/**/*.js": {
+      "maxDuration": 30
+    }
+  }
+}
+```
+
+## Cannot Load Project Settings
+
+If the Project configuration in `.vercel` belongs to a Team you are not a member of, attempting to deploy the Project will result in an error.
+
+This may happen if you clone a Git repository that includes the `.vercel` directory, or you are logged in to the wrong Vercel Account.
+
+To fix it, remove the `.vercel` directory and deploy to link the Project again by running these commands.
+
+On macOS and Linux:
+
+<Snippet text={['rm -rf .vercel', 'vercel']} dark />
+
+On Windows:
+
+<Snippet text={['rmdir /s /q .vercel', 'vercel']} dark />
+
+### Project Name Validation
+
+Project names can only consist of up to 100 alphanumeric lowercase characters. Hyphens can be used in between the name, but never at the start or end.
+
+## Bypassing Password Protection Programmatically
+
+When [Password Protection](/docs/v2/platform/projects#password-protection) is enabled on your Projects,
+you can bypass the protection programmatically with the following steps:
+
+- Send a `POST` request to your Deployment with the password in the request body `_vercel_password=<password>`.
+- Parse the `Set-Cookie` response header and extract the cookie `_vercel_jwt` from the response.
+- Set the cookie to the `Cookie` request header when you access the Deployment
+
+**Example Request**
+
+```shell
+cookie="$(curl -s -D - -o /dev/null -X POST -d "_vercel_password=<password>" https://example.vercel.app | grep -i Set-Cookie | grep _vercel_jwt | awk {'print $2'})"
+curl -H "Cookie: $cookie" https://example.vercel.app
+```
+
+This steps are required per url and cookie values cannot be shared among Deployments.
