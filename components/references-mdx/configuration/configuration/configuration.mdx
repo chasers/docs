@@ -59,11 +59,11 @@ Specifies the [<ProductName /> Platform version](/docs/v2/platform/overview#vers
 
 **Type**: `Array` or `String`.
 
-**Valid values**: [domain names](/docs/v2/custom-domains) (optionally including subdomains) added to the account, or a string for a suffixed URL using `.now.sh` or a Custom Deployment Suffix ([available on the Enterprise plan](/pricing)).
+**Valid values**: [domain names](/docs/v2/custom-domains) (optionally including subdomains) added to the account, or a string for a suffixed URL using `.vercel.app` or a Custom Deployment Suffix ([available on the Enterprise plan](/pricing)).
 
 **Limit**: A maximum of 64 aliases in the array.
 
-The alias or aliases are applied automatically using [<ProductName /> for GitHub](/docs/v2/git-integrations/vercel-for-github), [<ProductName /> for GitLab](/docs/v2/git-integrations/vercel-for-gitlab), or [<ProductName /> for Bitbucket](/docs/v2/git-integrations/vercel-for-bitbucket) when merging or pushing to the default branch.
+The alias or aliases are applied automatically using [<ProductName /> for GitHub](/docs/v2/git-integrations/vercel-for-github), [<ProductName /> for GitLab](/docs/v2/git-integrations/vercel-for-gitlab), or [<ProductName /> for Bitbucket](/docs/v2/git-integrations/vercel-for-bitbucket) when merging or pushing to the [Production Branch](/docs/v2/git-integrations#production-branch).
 
 You can deploy to the defined aliases using [<ProductShortName /> CLI](/download) by setting the [production deployment environment target](/docs/v2/custom-domains#deploying-with-your-domain).
 
@@ -154,12 +154,17 @@ Environment variables passed to the invoked [Serverless Functions](/docs/v2/serv
 
 ## builds
 
-<Note type="alert">
-  The <InlineCode>builds</InlineCode> property has been deprecated in favor of{' '}
-  <Link href="/docs/configuration#project/functions">functions</Link>. In the
-  majority of cases, you are no longer required to specify a{' '}
-  <InlineCode>build</InlineCode>, instead relying on the{' '}
-  <Link href="/docs/v2/build-step/">build step</Link>.
+<Note>
+  There's no need to use this property for deploying your frontend. If you'd
+  like to customize your Serverless Functions, use the{' '}
+  <Link href="/docs/configuration#project/functions">functions</Link> property
+  instead.
+  <br />
+  <br />
+  The only case in which the use of <InlineCode>builds</InlineCode> is still recommended
+  is if your Git repository contains multiple different frontends that you would
+  like to mount to different paths in your URL. True monorepos (mounting multiple
+  frontends to different domains) are currently not supported.
 </Note>
 
 **Type:** `Array` of build `Object`.
@@ -183,18 +188,18 @@ Environment variables passed to the invoked [Serverless Functions](/docs/v2/serv
 
 <Code lang="json">{`{
   "builds": [
-    { "src": "*.html", "use": "@now/static" },
-    { "src": "*.py", "use": "@now/python" },
-    { "src": "*.js", "use": "@now/node" }
+    { "src": "*.html", "use": "@vercel/static" },
+    { "src": "*.py", "use": "@vercel/python" },
+    { "src": "*.js", "use": "@vercel/node" }
   ]
 }`}</Code>
 
 <Note>
   When at least one <InlineCode>builds</InlineCode> item is specified, only the
   outputs of the build processes will be included in the resulting deployment as
-  a security precaution. This is why we need to white-list static files
+  a security precaution. This is why we need to allowlist static files
   explicitly with
-  <InlineCode>@now/static</InlineCode>.
+  <InlineCode>@vercel/static</InlineCode>.
 </Note>
 
 ## functions
@@ -250,12 +255,12 @@ In order to use a runtime that is not [officially supported](/docs/v2/serverless
 <Code lang="json">{`{
   "functions": {
     "api/test.php": {
-      "runtime": "now-php"
+      "runtime": "vercel-php@0.1.0"
     }
   }
 }`}</Code>
 
-In the example above, the `api/test.php` Serverless Function does not use one of the [officially supported runtimes](/docs/v2/serverless-functions/supported-languages/). In turn, a `runtime` property was added in order to invoke the [now-php](https://www.npmjs.com/package/now-php) community runtime.
+In the example above, the `api/test.php` Serverless Function does not use one of the [officially supported runtimes](/docs/v2/serverless-functions/supported-languages/). In turn, a `runtime` property was added in order to invoke the [vercel-php](https://www.npmjs.com/package/vercel-php) community runtime.
 
 For more information on Runtimes, see the documentation:
 
@@ -314,6 +319,15 @@ For more information on routes, see the documentation:
 </Card>
 
 ## regions
+
+<Note type="warning">
+  Deploying Serverless Functions to multiple regions is limited to{' '}
+  <Link href="/pricing">Enterprise plans</Link>. Read more about this limit on{' '}
+  <Link href="/docs/v2/platform/limits#serverless-function-regions">
+    the Limits page
+  </Link>
+  .
+</Note>
 
 **Type:** `Array` of region identifier `String`.
 

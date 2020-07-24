@@ -123,6 +123,10 @@ const guidesRedirects = [
     'monitor-frontend-performance-with-debugbear-and-vercel'
   ],
   [
+    'debugging-and-troubleshooting-zeit-now-logs-with-sematext',
+    'debugging-and-troubleshooting-vercel-logs-with-sematext'
+  ],
+  [
     'monitoring-performance-with-calibre-and-zeit-now',
     'monitoring-performance-with-calibre-and-vercel'
   ],
@@ -448,6 +452,16 @@ module.exports = withMDX({
           source: '/docs/now-cli/:path*',
           permanent: true,
           destination: '/docs/cli/:path*'
+        },
+        {
+          source: '/guides/setup-godaddy-domain-vercel',
+          permanent: true,
+          destination: '/docs/v2/custom-domains'
+        },
+        {
+          source: '/guides/setup-namecheap-domain-vercel',
+          permanent: true,
+          destination: '/docs/v2/custom-domains'
         }
       ]
     }
